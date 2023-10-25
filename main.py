@@ -61,15 +61,25 @@ users = {
 
 @app.route('/login', methods=['POST'])
 def login():
-
     print('Login')
     username = request.form.get('username')
     password = request.form.get('password')
 
     if username in users and check_password_hash(users[username], password):
         # Aqui, você pode fornecer credenciais ou tokens para acesso ao Raspberry Pi.
+        proxy() # Redireciona para o Raspberry Pi
         return jsonify({"message": "Logado com sucesso!"}), 200
     return jsonify({"message": "Credenciais Invalidas!"}), 401
+
+RASPBERRY_PI_URL = "http://186.227.147.69"
+
+# @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+def proxy(path):
+    ''' Encaminha todas as requisições para o Raspberry Pi '''
+    full_url = f"{RASPBERRY_PI_URL}/{path}"
+    response = requests.request(request.method, full_url, data=request.data, headers=request.headers)
+    return (response.text, response.status_code, response.headers.items())
+
 
 
 if __name__ == '__main__':
