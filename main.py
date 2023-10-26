@@ -6,8 +6,8 @@ Projeto de sistema de conexão entre cubículo-manutenção
 Descrição do problema:
     Trabalho em uma empresa que faz a automação de pchs e cghs, e estamos com dificuldades de prestar 
 manutenção para o cubículos instalados, por conta da distância entre a empresa e os cubículos.
-    A ideia é criar um sistema que possa ser instalado nos cubículos, que possa ser acessado remotamente
-e que possa ser feito a manutenção de forma remota.
+    A ideia é usar o raspberry como ponte, para acessar os outros dispositivos, e atraves do notebook que está a 100km do
+raspberry, se conectar no CLP, ou outros dispositivos da rede e dai, fazer a manutenção de forma remota.
     Existem quatros dispositivos que devem ser controlados remotamente, eles são:
         - relé de proteção, que possui comunicação via modbus TCP/IP;
         - regulador de tensão, que possui comunicação via modbus TCP/IP;
@@ -45,7 +45,7 @@ Criando um ambiente de teste para o projeto
     - Configuração do rasp:
 
 '''
-
+from multiprocessing import Process
 from flask import Flask, request, jsonify, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -67,13 +67,13 @@ def login():
 
     if username in users and check_password_hash(users[username], password):
         # Aqui, você pode fornecer credenciais ou tokens para acesso ao Raspberry Pi.
-        proxy() # Redireciona para o Raspberry Pi
+        # proxy() # Redireciona para o Raspberry Pi
         return jsonify({"message": "Logado com sucesso!"}), 200
     return jsonify({"message": "Credenciais Invalidas!"}), 401
 
 RASPBERRY_PI_URL = "http://186.227.147.69"
 
-# @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+# @app.route('/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE']) 51820
 def proxy(path):
     ''' Encaminha todas as requisições para o Raspberry Pi '''
     full_url = f"{RASPBERRY_PI_URL}/{path}"
